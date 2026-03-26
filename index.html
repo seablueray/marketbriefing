@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Market Briefing · Hyderabad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:wght@500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f0e;
+    --surface: #141614;
+    --card: #1a1d1a;
+    --border: #252825;
+    --border-soft: #1e211e;
+    --text: #e8ebe6;
+    --muted: #6b7068;
+    --hint: #3a3e38;
+    --green: #4ade80;
+    --green-dim: #1a3a26;
+    --red: #f87171;
+    --red-dim: #3a1a1a;
+    --gold: #fbbf24;
+    --gold-dim: #2e2410;
+    --silver: #94a3b8;
+    --silver-dim: #1a1e26;
+    --accent: #a3e635;
+    --accent-dim: #1e2e10;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+  }
+
+  /* Subtle grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--border-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border-soft) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    max-width: 960px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* HEADER */
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo-area h1 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: clamp(1.5rem, 4vw, 2.2rem);
+    letter-spacing: -0.02em;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .logo-area .sub {
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 6px;
+    font-weight: 400;
+  }
+
+  .header-right {
+    text-align: right;
+  }
+
+  #clock {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--accent);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  #dateline {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* REFRESH BAR */
+  .refresh-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 2rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  #last-updated { font-family: 'DM Mono', monospace; font-size: 0.7rem; }
+
+  .refresh-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    background: var(--accent-dim);
+    border: 1px solid var(--accent);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 0.72rem;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+
+  .refresh-btn:hover { background: var(--accent); color: #0d0f0e; }
+  .refresh-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .spinner {
+    width: 12px; height: 12px;
+    border: 1.5px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    display: none;
+    animation: spin 0.7s linear infinite;
+  }
+  .loading .spinner { display: block; }
+  .loading .refresh-icon { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* SECTION LABELS */
+  .section-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 2rem 0 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* GRID */
+  .grid { display: grid; gap: 10px; }
+  .g2 { grid-template-columns: repeat(2, 1fr); }
+  .g3 { grid-template-columns: repeat(3, 1fr); }
+  .g4 { grid-template-columns: repeat(4, 1fr); }
+
+  @media (max-width: 600px) {
+    .g3, .g4 { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 400px) {
+    .g2 { grid-template-columns: 1fr; }
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.1rem 0.9rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: var(--border-soft); filter: brightness(1.05); }
+
+  .card-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+    font-weight: 400;
+  }
+
+  .card-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.45rem;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .card-change {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    margin-top: 7px;
+    font-weight: 400;
+  }
+
+  .card-sub {
+    font-size: 0.68rem;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* Change color classes */
+  .up { color: var(--green); }
+  .dn { color: var(--red); }
+  .neu { color: var(--muted); }
+
+  /* Color accents on cards */
+  .card.gold-card { border-left: 2px solid var(--gold); }
+  .card.silver-card { border-left: 2px solid var(--silver); }
+  .card.index-card { border-left: 2px solid var(--accent); }
+  .card.us-card { border-left: 2px solid #60a5fa; }
+  .card.oil-card { border-left: 2px solid #fb923c; }
+  .card.fx-card { border-left: 2px solid #c084fc; }
+
+  /* Skeleton loading shimmer */
+  .skeleton {
+    background: linear-gradient(90deg, var(--card) 25%, var(--border) 50%, var(--card) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+    border-radius: 4px;
+    height: 1.4rem;
+    width: 80%;
+    margin-top: 4px;
+  }
+  .skeleton.sm { height: 0.8rem; width: 50%; margin-top: 8px; }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+
+  /* ERROR STATE */
+  .card.error .card-value { color: var(--red); font-size: 0.9rem; }
+
+  /* FOOTER */
+  footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.65rem;
+    color: var(--hint);
+    line-height: 1.7;
+    letter-spacing: 0.03em;
+  }
+
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--text); }
+
+  /* Market status badge */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-left: auto;
+  }
+
+  .status-badge.open { background: var(--green-dim); color: var(--green); border: 1px solid var(--green); }
+  .status-badge.closed { background: var(--red-dim); color: var(--red); border: 1px solid var(--red); }
+  .status-badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+  /* Pulse for live indicator */
+  .live-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-right: 6px;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <header>
+    <div class="logo-area">
+      <h1>Market Briefing</h1>
+      <div class="sub"><span class="live-dot"></span>Hyderabad · India · Live Data</div>
+    </div>
+    <div class="header-right">
+      <div id="clock">--:--:--</div>
+      <div id="dateline">Loading date...</div>
+    </div>
+  </header>
+
+  <div class="refresh-bar">
+    <span>Last updated: <span id="last-updated">—</span></span>
+    <button class="refresh-btn" id="refreshBtn" onclick="fetchAll()">
+      <span class="refresh-icon">↻ Refresh</span>
+      <span class="spinner"></span>
+    </button>
+    <div id="nse-status"></div>
+  </div>
+
+  <!-- INDIAN INDICES -->
+  <div class="section-label">Indian indices</div>
+  <div class="grid g2">
+    <div class="card index-card" id="card-nifty">
+      <div class="card-label">NIFTY 50</div>
+      <div class="card-value"><div class="skeleton"></div></div>
+      <div class="card-change"><div class="skeleton sm"></div></div>
+    </div>
+    <div class="card index-card" id="card-sensex">
+      <div class="card-label">SENSEX</div>
+      <div class="card-value"><div class="skeleton"></div></div>
+      <div class="card-change"><div class="skeleton sm"></div></div>
+    </div>
+  </div>
+
+  <!-- GOLD -->
+  <div class="section-label">Gold · Hyderabad (INR / gram, excl. GST)</div>
+  <div class="grid g3">
+    <div class="card gold-card" id="card-gold24">
+      <div class="card-label">24 Karat</div>
+      <div class="card-value"><div class="skeleton"></div></div>
+      <div class="card-sub">per gram</div>
+    </div>
+    <div class="card gold-card" id="card-gold22">
+      <div class="card-label">22 Karat (916)</div>
+      <div class="card-value"><div class="skeleton"></div></div>
+      <div class="card-sub">per gram</div>
+    </div>
+    <div class="card gold-card" id="card-gold18">
+      <div class="card-label">18 Karat</div>
+      <div class="card-value"><div class="skeleton"></div></div>
+      <div class="card-sub">per gram</div>
+    </div>
+  </div>
+
+  <!-- SILVER -->
+  <div class="section-label">Silver · Hyderabad (INR)</div>
+  <div class="grid g2">
+    <div class="card silver-card" id="card-silver-g">
+      <div class="card-label">Silver per gram</div>
+      <div class="card-value"><div class="skeleton"></div></div>
+      <div class="card-sub">INR / gram</div>
+    </div>
+    <div class="card silver-card" id="card-silver-kg">
+      <div class="card-label">Silver per kg</div>
+      <div class="card-value"><div class="skeleton"></div></div>
+      <div class="card-sub">INR / kg</div>
+    </div>
+  </div>
+
+  <!-- US INDICES -->
+  <div class="section-label">US indices</div>
+  <div class="grid g3">
+    <div class="card us-card" id="card-sp500">
+      <div class="card-label">S&amp;P 500</div>
+      <div class="card-value"><div class="skeleton"></div></div>
+      <div class="card-change"><div class="skeleton sm"></div></div>
+    </div>
+    <div class="card us-card" id="card-dji">
+      <div class="card-label">Dow Jones</div>
+      <div class="card-value"><div class="skeleton"></div></div>
+      <div class="card-change"><div class="skeleton sm"></div></div>
+    </div>
+    <div class="card us-card" id="card-nasdaq">
+      <div class="card-label">Nasdaq</div>
+      <div class="card-value"><div class="skeleton"></div></div>
+      <div class="card-change"><div class="skeleton sm"></div></div>
+    </div>
+  </div>
+
+  <!-- CRUDE OIL -->
+  <div class="section-label">Crude oil (USD / barrel)</div>
+  <div class="grid g2">
+    <div class="card oil-card" id="card-brent">
+      <div class="card-label">Brent Crude</div>
+      <div class="card-value"><div class="skeleton"></div></div>
+      <div class="card-change"><div class="skeleton sm"></div></div>
+    </div>
+    <div class="card oil-card" id="card-wti">
+      <div class="card-label">WTI Crude</div>
+      <div class="card-value"><div class="skeleton"></div></div>
+      <div class="card-change"><div class="skeleton sm"></div></div>
+    </div>
+  </div>
+
+  <!-- FX -->
+  <div class="section-label">Currency (mid-market)</div>
+  <div class="grid g2">
+    <div class="card fx-card" id="card-usdinr">
+      <div class="card-label">USD → INR</div>
+      <div class="card-value"><div class="skeleton"></div></div>
+      <div class="card-change"><div class="skeleton sm"></div></div>
+    </div>
+    <div class="card fx-card" id="card-eurinr">
+      <div class="card-label">EUR → INR</div>
+      <div class="card-value"><div class="skeleton"></div></div>
+      <div class="card-change"><div class="skeleton sm"></div></div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Data sourced via Yahoo Finance (delayed ~15 min for indices during market hours). Gold &amp; silver prices are MCX-derived indicative rates; actual jeweller prices may vary. Currency rates are mid-market. Not financial advice — always verify with your broker or jeweller before transacting.</p>
+    <p style="margin-top:6px">Auto-refreshes every <strong style="color:var(--muted)">5 minutes</strong> while the tab is open. Click ↻ Refresh for an instant update. Works best on Chrome / Firefox / Safari.</p>
+  </footer>
+
+</div>
+
+<script>
+// ─── CLOCK ───────────────────────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Kolkata' });
+  const dateStr = now.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' }).toUpperCase();
+  document.getElementById('clock').textContent = timeStr;
+  document.getElementById('dateline').textContent = dateStr + ' IST';
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// NSE market hours: 9:15 AM – 3:30 PM IST Mon–Fri
+function isNSEOpen() {
+  const now = new Date();
+  const ist = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+  const day = ist.getDay(); // 0=Sun
+  const h = ist.getHours(), m = ist.getMinutes();
+  const mins = h * 60 + m;
+  return day >= 1 && day <= 5 && mins >= 555 && mins <= 930; // 9:15–15:30
+}
+
+function updateMarketStatus() {
+  const el = document.getElementById('nse-status');
+  const open = isNSEOpen();
+  el.innerHTML = `<span class="status-badge ${open ? 'open' : 'closed'}">${open ? 'NSE Open' : 'NSE Closed'}</span>`;
+}
+updateMarketStatus();
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+const fmt = (n, dec = 2) => n == null ? '—' : n.toLocaleString('en-IN', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+const fmtINR = (n) => n == null ? '—' : '₹' + n.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+const fmtUSD = (n) => n == null ? '—' : '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+function changeClass(pct) {
+  if (pct == null) return 'neu';
+  return pct > 0 ? 'up' : pct < 0 ? 'dn' : 'neu';
+}
+
+function changeArrow(pct) {
+  if (pct == null) return '';
+  return pct > 0 ? '▲' : pct < 0 ? '▼' : '—';
+}
+
+function renderCard(id, value, change, changePct, sub) {
+  const card = document.getElementById(id);
+  if (!card) return;
+  const cls = changeClass(changePct);
+  const arr = changeArrow(changePct);
+  const pctStr = changePct != null ? Math.abs(changePct).toFixed(2) + '%' : '';
+  const chgStr = change != null ? (change > 0 ? '+' : '') + fmt(change) : '';
+
+  card.innerHTML = `
+    <div class="card-label">${card.querySelector('.card-label')?.textContent || ''}</div>
+    <div class="card-value">${value}</div>
+    ${changePct != null ? `<div class="card-change ${cls}">${arr} ${pctStr}${chgStr ? ' · ' + chgStr : ''}</div>` : ''}
+    ${sub ? `<div class="card-sub">${sub}</div>` : ''}
+  `;
+  // restore label
+  card.querySelector('.card-label').textContent = {
+    'card-nifty': 'NIFTY 50','card-sensex': 'SENSEX',
+    'card-gold24': '24 Karat','card-gold22': '22 Karat (916)','card-gold18': '18 Karat',
+    'card-silver-g': 'Silver per gram','card-silver-kg': 'Silver per kg',
+    'card-sp500': 'S&P 500','card-dji': 'Dow Jones','card-nasdaq': 'Nasdaq',
+    'card-brent': 'Brent Crude','card-wti': 'WTI Crude',
+    'card-usdinr': 'USD → INR','card-eurinr': 'EUR → INR'
+  }[id] || '';
+}
+
+function renderError(id, msg) {
+  const card = document.getElementById(id);
+  if (!card) return;
+  const label = {
+    'card-nifty': 'NIFTY 50','card-sensex': 'SENSEX',
+    'card-gold24': '24 Karat','card-gold22': '22 Karat (916)','card-gold18': '18 Karat',
+    'card-silver-g': 'Silver per gram','card-silver-kg': 'Silver per kg',
+    'card-sp500': 'S&P 500','card-dji': 'Dow Jones','card-nasdaq': 'Nasdaq',
+    'card-brent': 'Brent Crude','card-wti': 'WTI Crude',
+    'card-usdinr': 'USD → INR','card-eurinr': 'EUR → INR'
+  }[id] || '';
+  card.classList.add('error');
+  card.innerHTML = `<div class="card-label">${label}</div><div class="card-value">Unavailable</div><div class="card-sub" style="color:var(--red);font-size:0.62rem">${msg}</div>`;
+}
+
+// ─── YAHOO FINANCE via AllOrigins proxy ──────────────────────────────────────
+// We use allorigins.win as a CORS proxy to call Yahoo Finance's v8 chart API
+async function fetchYahoo(symbol) {
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=2d`;
+  const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+  const res = await fetch(proxy, { signal: AbortSignal.timeout(12000) });
+  if (!res.ok) throw new Error('Proxy error ' + res.status);
+  const outer = await res.json();
+  const data = JSON.parse(outer.contents);
+  const result = data?.chart?.result?.[0];
+  if (!result) throw new Error('No data');
+  const meta = result.meta;
+  const price = meta.regularMarketPrice;
+  const prev  = meta.chartPreviousClose || meta.previousClose;
+  const change = price - prev;
+  const changePct = (change / prev) * 100;
+  return { price, prev, change, changePct, symbol: meta.symbol };
+}
+
+// ─── GOLD & SILVER via MCX gold futures proxy ─────────────────────────────────
+// Gold: GC=F (COMEX USD/oz) converted to INR/gram via USD/INR rate
+// Silver: SI=F (COMEX USD/oz) converted to INR/gram
+// 1 troy oz = 31.1035 grams
+const TROY_OZ_TO_GRAM = 31.1035;
+
+async function fetchGoldSilver(usdInr) {
+  const [goldData, silverData] = await Promise.all([
+    fetchYahoo('GC=F'),
+    fetchYahoo('SI=F')
+  ]);
+
+  // Gold USD/oz → INR/gram
+  const goldPerGram24 = (goldData.price * usdInr) / TROY_OZ_TO_GRAM;
+  const goldPerGram22 = goldPerGram24 * 0.9167;
+  const goldPerGram18 = goldPerGram24 * 0.75;
+
+  // Silver USD/oz → INR/gram
+  const silverPerGram = (silverData.price * usdInr) / TROY_OZ_TO_GRAM;
+  const silverPerKg   = silverPerGram * 1000;
+
+  return {
+    gold24: goldPerGram24, gold22: goldPerGram22, gold18: goldPerGram18,
+    silver: silverPerGram, silverKg: silverPerKg
+  };
+}
+
+// ─── MAIN FETCH ───────────────────────────────────────────────────────────────
+let isFetching = false;
+
+async function fetchAll() {
+  if (isFetching) return;
+  isFetching = true;
+
+  const btn = document.getElementById('refreshBtn');
+  btn.disabled = true;
+  btn.classList.add('loading');
+
+  // Show skeletons
+  const skeletonCard = (id) => {
+    const card = document.getElementById(id);
+    const label = card.querySelector('.card-label')?.textContent || '';
+    card.classList.remove('error');
+    card.innerHTML = `<div class="card-label">${label}</div><div class="card-value"><div class="skeleton"></div></div><div class="skeleton sm"></div>`;
+  };
+  ['card-nifty','card-sensex','card-sp500','card-dji','card-nasdaq',
+   'card-brent','card-wti','card-usdinr','card-eurinr',
+   'card-gold24','card-gold22','card-gold18','card-silver-g','card-silver-kg'].forEach(skeletonCard);
+
+  try {
+    // Fetch all in parallel
+    const [nifty, sensex, sp500, dji, nasdaq, brent, wti, usdinr, eurinr] = await Promise.allSettled([
+      fetchYahoo('^NSEI'),
+      fetchYahoo('^BSESN'),
+      fetchYahoo('^GSPC'),
+      fetchYahoo('^DJI'),
+      fetchYahoo('^IXIC'),
+      fetchYahoo('BZ=F'),
+      fetchYahoo('CL=F'),
+      fetchYahoo('USDINR=X'),
+      fetchYahoo('EURINR=X')
+    ]);
+
+    // ── USD/INR (needed for gold conversion) ──
+    let usdRate = 85; // fallback
+    if (usdinr.status === 'fulfilled') {
+      usdRate = usdinr.value.price;
+      renderCard('card-usdinr', '₹' + fmt(usdRate), usdinr.value.change, usdinr.value.changePct, 'per USD');
+    } else renderError('card-usdinr', 'Try refreshing');
+
+    // ── Gold & Silver ──
+    try {
+      const metals = await fetchGoldSilver(usdRate);
+      renderCard('card-gold24', fmtINR(metals.gold24), null, null, 'per gram');
+      renderCard('card-gold22', fmtINR(metals.gold22), null, null, 'per gram');
+      renderCard('card-gold18', fmtINR(metals.gold18), null, null, 'per gram');
+      renderCard('card-silver-g', fmtINR(metals.silver), null, null, 'per gram');
+      renderCard('card-silver-kg', fmtINR(metals.silverKg), null, null, 'per kg');
+    } catch (e) {
+      ['card-gold24','card-gold22','card-gold18'].forEach(id => renderError(id, 'Metals data unavailable'));
+      ['card-silver-g','card-silver-kg'].forEach(id => renderError(id, 'Metals data unavailable'));
+    }
+
+    // ── NIFTY ──
+    if (nifty.status === 'fulfilled') {
+      const d = nifty.value;
+      renderCard('card-nifty', fmt(d.price, 0), d.change, d.changePct, 'NSE');
+    } else renderError('card-nifty', 'NSE data unavailable');
+
+    // ── SENSEX ──
+    if (sensex.status === 'fulfilled') {
+      const d = sensex.value;
+      renderCard('card-sensex', fmt(d.price, 0), d.change, d.changePct, 'BSE');
+    } else renderError('card-sensex', 'BSE data unavailable');
+
+    // ── S&P 500 ──
+    if (sp500.status === 'fulfilled') {
+      const d = sp500.value;
+      renderCard('card-sp500', fmt(d.price, 0), d.change, d.changePct, 'NYSE');
+    } else renderError('card-sp500', 'Data unavailable');
+
+    // ── DJI ──
+    if (dji.status === 'fulfilled') {
+      const d = dji.value;
+      renderCard('card-dji', fmt(d.price, 0), d.change, d.changePct, 'NYSE');
+    } else renderError('card-dji', 'Data unavailable');
+
+    // ── NASDAQ ──
+    if (nasdaq.status === 'fulfilled') {
+      const d = nasdaq.value;
+      renderCard('card-nasdaq', fmt(d.price, 0), d.change, d.changePct, 'NASDAQ');
+    } else renderError('card-nasdaq', 'Data unavailable');
+
+    // ── BRENT ──
+    if (brent.status === 'fulfilled') {
+      const d = brent.value;
+      renderCard('card-brent', fmtUSD(d.price), d.change, d.changePct, 'per barrel');
+    } else renderError('card-brent', 'Data unavailable');
+
+    // ── WTI ──
+    if (wti.status === 'fulfilled') {
+      const d = wti.value;
+      renderCard('card-wti', fmtUSD(d.price), d.change, d.changePct, 'per barrel');
+    } else renderError('card-wti', 'Data unavailable');
+
+    // ── EUR/INR ──
+    if (eurinr.status === 'fulfilled') {
+      const d = eurinr.value;
+      renderCard('card-eurinr', '₹' + fmt(d.price), d.change, d.changePct, 'per EUR');
+    } else renderError('card-eurinr', 'Try refreshing');
+
+    // Restore labels after render (renderCard overwrites innerHTML)
+    const labels = {
+      'card-nifty': 'NIFTY 50','card-sensex': 'SENSEX',
+      'card-gold24': '24 Karat','card-gold22': '22 Karat (916)','card-gold18': '18 Karat',
+      'card-silver-g': 'Silver per gram','card-silver-kg': 'Silver per kg',
+      'card-sp500': 'S&P 500','card-dji': 'Dow Jones','card-nasdaq': 'Nasdaq',
+      'card-brent': 'Brent Crude','card-wti': 'WTI Crude',
+      'card-usdinr': 'USD → INR','card-eurinr': 'EUR → INR'
+    };
+    Object.entries(labels).forEach(([id, lbl]) => {
+      const el = document.getElementById(id)?.querySelector('.card-label');
+      if (el) el.textContent = lbl;
+    });
+
+    document.getElementById('last-updated').textContent =
+      new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' IST';
+
+  } catch (e) {
+    console.error('fetchAll error', e);
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('loading');
+    isFetching = false;
+    updateMarketStatus();
+  }
+}
+
+// ─── AUTO REFRESH every 5 minutes ────────────────────────────────────────────
+fetchAll();
+setInterval(fetchAll, 5 * 60 * 1000);
+</script>
+</body>
+</html>
